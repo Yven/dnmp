@@ -152,11 +152,6 @@ if [[ -z "${EXTENSIONS##*,pdo_firebird,*}" ]]; then
 	docker-php-ext-install ${MC} pdo_firebird
 fi
 
-if [[ -z "${EXTENSIONS##*,pdo_oci,*}" ]]; then
-    echo "---------- Install pdo_oci ----------"
-	docker-php-ext-install ${MC} pdo_oci
-fi
-
 if [[ -z "${EXTENSIONS##*,pdo_odbc,*}" ]]; then
     echo "---------- Install pdo_odbc ----------"
 	docker-php-ext-install ${MC} pdo_odbc
@@ -569,6 +564,12 @@ fi
 if [[ -z "${EXTENSIONS##*,mongodb,*}" ]]; then
     echo "---------- Install mongodb ----------"
     installExtensionFromTgz mongodb-1.7.4
+fi
+
+if [[ -z "${EXTENSIONS##*,pdo_oci,*}" ]]; then
+    echo "---------- Install pdo_oci ----------"
+    # docker-php-ext-install ${MC} pdo_oci
+    installExtensionFromTgz pdo_oci
 fi
 
 if [[ -z "${EXTENSIONS##*,yaf,*}" ]]; then
