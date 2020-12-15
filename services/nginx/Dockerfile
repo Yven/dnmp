@@ -6,6 +6,11 @@ ARG NGINX_VERSION
 ARG CONTAINER_PACKAGE_URL
 ARG NGINX_INSTALL_APPS
 
+
+COPY ./initsh /usr/local/bin/
+RUN chmod 777 /usr/local/bin/initsh
+
+
 ENV INSTALL_APPS=",${NGINX_INSTALL_APPS},"
 
 RUN if [ "${CONTAINER_PACKAGE_URL}" != "" ]; then \
