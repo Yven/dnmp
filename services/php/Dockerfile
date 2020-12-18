@@ -27,6 +27,7 @@ RUN apk --no-cache add tzdata \
     && cp "/usr/share/zoneinfo/$TZ" /etc/localtime \
     && echo "$TZ" > /etc/timezone
 
+RUN install-php-extensions pdo_dblib
 
 # Fix: https://github.com/docker-library/php/issues/240
 RUN apk add git gnu-libiconv libstdc++ --no-cache --repository http://${CONTAINER_PACKAGE_URL}/alpine/edge/community/ --allow-untrusted

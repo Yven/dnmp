@@ -1,3 +1,0 @@
-[submodule "www/htdocs/laradock"]
-	path = www/htdocs/laradock
-	url = https://github.com/Laradock/laradock.git
