@@ -5,17 +5,13 @@ ARG TZ
 ARG PHP_EXTENSIONS
 ARG CONTAINER_PACKAGE_URL
 
-
-COPY ./initsh /usr/local/bin/
-RUN chmod 777 /usr/local/bin/initsh
-
-
 RUN if [ $CONTAINER_PACKAGE_URL ] ; then sed -i "s/dl-cdn.alpinelinux.org/${CONTAINER_PACKAGE_URL}/g" /etc/apk/repositories ; fi
 
 
 COPY ./extensions /tmp/extensions
 WORKDIR /tmp/extensions
-RUN chmod +x install.sh \
+RUN apk add --no-cache coreutils \
+    && chmod +x install.sh \
     && sh install.sh \
     && rm -rf /tmp/extensions
 
@@ -44,3 +40,6 @@ RUN apk --no-cache add shadow && usermod -u 1000 www-data && groupmod -g 1000 ww
 
 
 WORKDIR /www
+
+COPY ./initsh /usr/local/bin/
+RUN chmod 777 /usr/local/bin/initsh

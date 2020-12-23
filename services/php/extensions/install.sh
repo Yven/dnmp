@@ -15,7 +15,7 @@ echo
 
 
 if [ "${PHP_EXTENSIONS}" != "" ]; then
-    apk --update add --no-cache --virtual .build-deps autoconf g++ libtool make curl-dev gettext-dev linux-headers
+    apk --update add --no-cache --virtual .build-deps autoconf g++ libtool make curl-dev gettext-dev linux-headers zlib-dev
 fi
 
 
@@ -70,6 +70,8 @@ installExtensionFromTgz()
 }
 
 pecl install grpc-1.28.0
+
+docker-php-ext-install ${MC} pdo
 
 if [[ -z "${EXTENSIONS##*,pdo_mysql,*}" ]]; then
     echo "---------- Install pdo_mysql ----------"
