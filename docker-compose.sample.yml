@@ -41,6 +41,8 @@ services:
     extra_hosts:
       - "hsk-api-v2.dev.oray.com:172.20.0.4"
       - "hsk-api.dev.oray.com:172.20.0.4"
+      - "hsk.dev.oray.com:172.20.0.4"
+      - "login.dev.oray.com:172.20.0.4"
     volumes:
       - ${SOURCE_DIR}:/www/:rw
       - ${PHP_PHP_CONF_FILE}:/usr/local/etc/php/php.ini:ro
@@ -73,6 +75,33 @@ services:
       nginx-php:
         ipv4_address: 172.20.0.3
 
+  memcached:
+    image: memcached:${MEMCACHED_VERSION}
+    container_name: memcached
+    ports:
+      - "${MEMCACHED_HOST_PORT}:11211"
+    environment:
+       MEMCACHED_CACHE_SIZE: "${MEMCACHED_CACHE_SIZE}"
+    networks:
+      nginx-php:
+        ipv4_address: 172.20.0.5
+
+  mysql5:
+    image: mysql:${MYSQL5_VERSION}
+    container_name: mysql5
+    ports:
+      - "${MYSQL5_HOST_PORT}:3306"
+    volumes:
+      - ${MYSQL5_CONF_FILE}:/etc/mysql/conf.d/mysql.cnf:ro
+      - ${DATA_DIR}/mysql5:/var/lib/mysql/:rw
+    restart: always
+    networks:
+      nginx-php:
+        ipv4_address: 172.20.0.6
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL5_ROOT_PASSWORD}"
+      TZ: "$TZ"
+
   # mysql:
   #   image: mysql:${MYSQL_VERSION}
   #   container_name: mysql
@@ -87,31 +116,6 @@ services:
   #   environment:
   #     MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
   #     TZ: "$TZ"
-
-#  mysql5:
-#    image: mysql:${MYSQL5_VERSION}
-#    container_name: mysql5
-#    ports:
-#      - "${MYSQL5_HOST_PORT}:3306"
-#    volumes:
-#      - ${MYSQL5_CONF_FILE}:/etc/mysql/conf.d/mysql.cnf:ro
-#      - ${DATA_DIR}/mysql5:/var/lib/mysql/:rw
-#    restart: always
-#    networks:
-#      - default
-#    environment:
-#      MYSQL_ROOT_PASSWORD: "${MYSQL5_ROOT_PASSWORD}"
-#      TZ: "$TZ"
-
-#  memcached:
-#    image: memcached:${MEMCACHED_VERSION}
-#    container_name: memcached
-#    ports:
-#      - "${MEMCACHED_HOST_PORT}:11211"
-#    environment:
-#       MEMCACHED_CACHE_SIZE: "${MEMCACHED_CACHE_SIZE}"
-#    networks:
-#      - default
 
 #  rabbitmq:
 #    image: rabbitmq:${RABBITMQ_VERSION}
