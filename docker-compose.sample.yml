@@ -4,6 +4,7 @@ services:
     build:
       context: ./services/nginx
       args:
+        NGINX_VERSION_NUM: ${NGINX_VERSION}
         NGINX_VERSION: nginx:${NGINX_VERSION}
         CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
         NGINX_INSTALL_APPS: ${NGINX_INSTALL_APPS}
@@ -27,6 +28,32 @@ services:
       nginx-php:
         ipv4_address: 172.20.0.4
 
+  phpvsc:
+    build:
+      context: ./services/php
+      args:
+        PHP_VERSION: php:7.2.14-fpm-alpine3.9
+        CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
+        PHP_EXTENSIONS: ${PHP_EXTENSIONS}
+        TZ: "$TZ"
+    container_name: phpvscode
+    ports:
+      - "9501:9000"
+    volumes:
+      - ${SOURCE_DIR}:/www/:rw
+      - ${PHP_PHP_CONF_FILE}:/usr/local/etc/php/php.ini:ro
+      - ${PHP_FPM_CONF_FILE}:/usr/local/etc/php-fpm.d/www.conf:rw
+      - ${PHP_LOG_DIR}/vsc:/var/log/php
+      - ${DATA_DIR}/composer:/tmp/composer:rw
+      - ${DATA_DIR}/ssh:/root/.ssh
+    restart: always
+    command: docker-php-entrypoint php-fpm
+    cap_add:
+      - SYS_PTRACE
+    networks:
+      nginx-php:
+        ipv4_address: 172.20.0.8
+
   php:
     build:
       context: ./services/php
@@ -43,6 +70,11 @@ services:
       - "hsk-api.dev.oray.com:172.20.0.4"
       - "hsk.dev.oray.com:172.20.0.4"
       - "login.dev.oray.com:172.20.0.4"
+      - "www.dev.orayer.com:172.20.0.4"
+      - "console.dev.oray.com:172.20.0.4"
+      - "www.dev.oray.com:172.20.0.4"
+      - "static.dev.orayimg.com:172.20.0.4"
+      - "url.dev.oray.com:172.20.0.4"
     volumes:
       - ${SOURCE_DIR}:/www/:rw
       - ${PHP_PHP_CONF_FILE}:/usr/local/etc/php/php.ini:ro
@@ -84,23 +116,37 @@ services:
        MEMCACHED_CACHE_SIZE: "${MEMCACHED_CACHE_SIZE}"
     networks:
       nginx-php:
-        ipv4_address: 172.20.0.5
+        ipv4_address: 172.20.0.10
 
-  mysql5:
-    image: mysql:${MYSQL5_VERSION}
-    container_name: mysql5
-    ports:
-      - "${MYSQL5_HOST_PORT}:3306"
-    volumes:
-      - ${MYSQL5_CONF_FILE}:/etc/mysql/conf.d/mysql.cnf:ro
-      - ${DATA_DIR}/mysql5:/var/lib/mysql/:rw
+#  mysql5:
+#    image: mysql:${MYSQL5_VERSION}
+#    container_name: mysql5
+#    ports:
+#      - "${MYSQL5_HOST_PORT}:3306"
+#    volumes:
+#      - ${MYSQL5_CONF_FILE}:/etc/mysql/conf.d/mysql.cnf:ro
+#      - ${DATA_DIR}/mysql5:/var/lib/mysql/:rw
+#    restart: always
+#    networks:
+#      nginx-php:
+#        ipv4_address: 172.20.0.6
+#    environment:
+#      MYSQL_ROOT_PASSWORD: "${MYSQL5_ROOT_PASSWORD}"
+#      TZ: "$TZ"
+
+  httpsqs:
+    image: toomee/httpsqs
     restart: always
+    container_name: httpsqs
+    #environment:
+    #  HTTPSQS_PARAM_A: 123456
+    ports:
+      - 12181:1218
+    volumes:
+      - ${DATA_DIR}/httpsqs:/data:rw
     networks:
       nginx-php:
-        ipv4_address: 172.20.0.6
-    environment:
-      MYSQL_ROOT_PASSWORD: "${MYSQL5_ROOT_PASSWORD}"
-      TZ: "$TZ"
+        ipv4_address: 172.20.0.11
 
   # mysql:
   #   image: mysql:${MYSQL_VERSION}
